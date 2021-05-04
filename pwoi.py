@@ -4,15 +4,15 @@ import csv
 def get_data(csv_file):
     '''This function extracts the data from the given csv file'''
 
+    # Creating a List named records so that it stores all the records
     records=[]
 
+    # Opening the CSV file and reading it
     with open(csv_file,'r') as f:
-        data=csv.DictReader(f)
-        records.append(['Date', 'Open', 'High', 'Low', 'Close'])
+        reader=csv.reader(f)
 
-        for element in data:
-            records.append([element['Date'].strip(),element['Open'].strip(),element['High'].strip(),element['Low'].strip(),element['Close'].strip()])
-        
+        for record in reader:
+            records.append(record)
         f.close()
-    
+        
     return records
