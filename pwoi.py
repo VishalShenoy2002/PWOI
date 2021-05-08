@@ -97,5 +97,5 @@ def plot_graph(info_file):
     ax.bar(x, positive_data, width=1, color='b')
     plt.show()
     # print(positive_data,negative_data)
-# write_data(r"E:\Programs\Application\PWOI\PWOI\fao_participant_oi_30042021.csv",r'test.csv')
+
 plot_graph(r'test.csv')
