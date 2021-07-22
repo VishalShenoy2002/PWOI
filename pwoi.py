@@ -1,5 +1,6 @@
 import csv
 import matplotlib.pyplot as plt
+from os import path
 
 # ==== FORMULA ==== #
 
@@ -19,10 +20,11 @@ import matplotlib.pyplot as plt
 
 
 # Creating s function called get_data to extract data from the given csv file
+
 def get_data(csv_file):
     '''This function extracts the data from the given csv file'''
 
-    datestring=csv_file.split('.')[0]
+    datestring=path.splitext(csv_file)[0].split('_')[-1]
     # Creating a List named records to store all the dictionaries
     records=[]
 
@@ -32,7 +34,7 @@ def get_data(csv_file):
 
         for record in reader:
             dict_record={}
-            dict_record['Date']='{}-{}-{}'.format(datestring[53:55],datestring[55:57],datestring[57:])
+            dict_record['Date']='{}-{}-{}'.format(datestring[0:2],datestring[2:4],datestring[4:])
             for key,value in record.items():
                 dict_record[key.strip()]=value
 
@@ -55,6 +57,7 @@ def get_data(csv_file):
         f.close()
     return records
 
+
 def write_data(file_to_read,file_to_write=''):
     '''Writes the data into csv files'''
 
@@ -70,32 +73,25 @@ def write_data(file_to_read,file_to_write=''):
     for key in keys:
         field_names.append(key)
     
+    if path.isfile(file_to_write)==False:
+        with open(file_to_write,'a',newline='') as f:
+            writer=csv.DictWriter(f,fieldnames=field_names)
+            writer.writeheader()
+            f.close()
+
     with open(file_to_write,'a',newline='') as f:
         writer=csv.DictWriter(f,fieldnames=field_names)
-        writer.writeheader()
         writer.writerows(data)
         f.close()
-    print('File Written')
-
-# ======================================================= #
-#            BUGY FUNCTION Below (plot_graph)             #
-# ======================================================= #
+        
+        print('File Written')
 
 
-def plot_graph(info_file):
-    information=get_data(info_file)
-    data=[]
-    for record in information:
-        if record['Client Type'] != 'TOTAL':
-            data.append([record['Client Type'],record['Index Net Long']])
-    positive_data=[value[1] for value in data if int(value[1])>0 else 0]
-    negative_data=[value[1] for value in data if int(value[1])<0]
-    x = range(4)
-    fig = plt.figure()
-    ax = plt.subplot()
-    ax.bar(x, negative_data, width=1, color='r')
-    ax.bar(x, positive_data, width=1, color='b')
-    plt.show()
-    # print(positive_data,negative_data)
+# Starting the Main Program
 
-plot_graph(r'test.csv')
+if __name__=="__main__":
+    data_files=['fao_participant_oi_30042021.csv','fao_participant_oi_03052021.csv']
+    for file in data_files:
+        print('Working on {}'.format(file))
+        write_data(file,'test.csv')
+        
