@@ -1,6 +1,7 @@
 import csv
-import matplotlib.pyplot as plt
-from os import path
+from os import path,listdir
+import requests
+import datetime
 
 # ==== FORMULA ==== #
 
@@ -21,6 +22,57 @@ from os import path
 
 # Creating s function called get_data to extract data from the given csv file
 
+def create_date_range(from_,to_=datetime.date.today()):
+    '''Creates a Date Range'''
+
+    date_range=[]
+    year,month,day=from_
+    from_date=datetime.date(year,month,day)
+    no_of_days=to_-from_date
+
+    for days in range(no_of_days.days):
+        date=from_date+datetime.timedelta(days)
+
+        if date.isoweekday()!=6 and date.isoweekday()!=7:
+            formated_date=date.strftime('%d%m%Y')
+            date_range.append(formated_date)
+            
+    return date_range 
+
+
+def download_fao_file(date):
+    '''Downloads the F&O file from nseindia
+    :param date DDMMYYYY'''
+
+    # Downloading the Data File from the web
+    print("Downloading Data...")
+    url="https://www1.nseindia.com/content/nsccl/fao_participant_oi_{}.csv".format(date)
+    web_content=requests.get(url,allow_redirects=True)
+    file_data=web_content.content.decode()
+    records=[]
+
+    filename=url.split('/')[-1]
+
+    # Saving the file with the web data
+    with open(filename,'a',newline='') as f:
+        f.write(file_data)
+        f.close()
+    
+
+    with open(filename,'r') as f:
+        reader=csv.reader(f)
+        for row in reader:
+            records.append(row)
+        f.close()
+
+    print("Writing the Data...")
+    with open(filename,'w',newline='') as f:
+        writer=csv.writer(f)
+        for index in range(1,len(records)):
+            writer.writerow(records[index])
+        f.close()
+        
+
 def get_data(csv_file):
     '''This function extracts the data from the given csv file'''
 
@@ -31,7 +83,6 @@ def get_data(csv_file):
     # Opening the CSV file and reading it
     with open(csv_file,'r') as f:
         reader=csv.DictReader(f)
-
         for record in reader:
             dict_record={}
             dict_record['Date']='{}-{}-{}'.format(datestring[0:2],datestring[2:4],datestring[4:])
@@ -90,8 +141,13 @@ def write_data(file_to_read,file_to_write=''):
 # Starting the Main Program
 
 if __name__=="__main__":
-    data_files=['fao_participant_oi_30042021.csv','fao_participant_oi_03052021.csv']
-    for file in data_files:
-        print('Working on {}'.format(file))
-        write_data(file,'test.csv')
-        
+    dates=create_date_range((2020,1,1))
+    for date in dates:
+        print('Processing Data for {}'.format(date))
+        download_fao_file(date)
+    for file in listdir('E:\Stock Test'):
+        try:
+            if file.endswith(".csv"):
+                write_data(file,'test.csv')
+        except Exception:
+            continue
