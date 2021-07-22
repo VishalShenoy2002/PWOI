@@ -19,9 +19,6 @@ import datetime
 # Stock Call Net = Call Long + Call Short
 # Stock Put Net = Put Long - Put Short
 
-
-# Creating s function called get_data to extract data from the given csv file
-
 def create_date_range(from_,to_=datetime.date.today()):
     '''Creates a Date Range'''
 
@@ -36,7 +33,7 @@ def create_date_range(from_,to_=datetime.date.today()):
         if date.isoweekday()!=6 and date.isoweekday()!=7:
             formated_date=date.strftime('%d%m%Y')
             date_range.append(formated_date)
-            
+
     return date_range 
 
 
@@ -145,7 +142,7 @@ if __name__=="__main__":
     for date in dates:
         print('Processing Data for {}'.format(date))
         download_fao_file(date)
-    for file in listdir('E:\Stock Test'):
+    for file in listdir():
         try:
             if file.endswith(".csv"):
                 write_data(file,'test.csv')
