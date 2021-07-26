@@ -145,6 +145,6 @@ if __name__=="__main__":
     for file in listdir():
         try:
             if file.endswith(".csv"):
-                write_data(file,'test.csv')
+                write_data(file,'Historical Data.csv')
         except Exception:
             continue
